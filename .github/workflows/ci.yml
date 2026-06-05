@@ -73,7 +73,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           working-directory: api
-          version: latest
+          version: v2.12.2
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
