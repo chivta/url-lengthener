@@ -84,7 +84,8 @@ func TestShortenURL_201(t *testing.T) {
 		t.Fatalf("expected 201, got %d", w.Code)
 	}
 	var resp map[string]any
-	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	if err != nil {
 		t.Fatalf("invalid JSON: %v", err)
 	}
 	if resp["slug"] != "abc123" {
@@ -122,7 +123,8 @@ func TestShortenURL_422_InvalidURL(t *testing.T) {
 		t.Fatalf("expected 422, got %d", w.Code)
 	}
 	var resp map[string]any
-	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	if err != nil {
 		t.Fatalf("invalid JSON: %v", err)
 	}
 	if resp["code"] != "invalid_url" {
@@ -147,7 +149,8 @@ func TestShortenURL_409_SlugConflict(t *testing.T) {
 		t.Fatalf("expected 409, got %d", w.Code)
 	}
 	var resp map[string]any
-	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	if err != nil {
 		t.Fatalf("invalid JSON: %v", err)
 	}
 	if resp["code"] != "slug_conflict" {
@@ -186,7 +189,8 @@ func TestGetURL_404(t *testing.T) {
 		t.Fatalf("expected 404, got %d", w.Code)
 	}
 	var resp map[string]any
-	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	if err != nil {
 		t.Fatalf("invalid JSON: %v", err)
 	}
 	if resp["code"] != "url_not_found" {

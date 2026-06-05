@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -33,14 +34,16 @@ func (s *Server) Run(ctx context.Context) error {
 	}
 	defer pool.Close()
 
-	if err := repository.RunMigrations(pool); err != nil {
+	err = repository.RunMigrations(pool)
+	if err != nil {
 		return fmt.Errorf("migrations: %w", err)
 	}
 
 	redisAddr := strings.TrimPrefix(s.cfg.RedisURL, "redis://")
 	rdb := redis.NewClient(&redis.Options{Addr: redisAddr})
-	defer rdb.Close()
-	if err := rdb.Ping(ctx).Err(); err != nil {
+	defer func() { _ = rdb.Close() }()
+	err = rdb.Ping(ctx).Err()
+	if err != nil {
 		return fmt.Errorf("redis ping: %w", err)
 	}
 
@@ -62,7 +65,8 @@ func (s *Server) Run(ctx context.Context) error {
 
 	slog.Info("server starting", "port", s.cfg.Port, "env", s.cfg.Environment)
 	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		err := srv.ListenAndServe()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			slog.Error("listen", "error", err)
 		}
 	}()

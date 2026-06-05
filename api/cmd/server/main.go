@@ -19,7 +19,8 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	if err := server.New(cfg).Run(ctx); err != nil {
+	err = server.New(cfg).Run(ctx)
+	if err != nil {
 		log.Fatalf("server: %v", err)
 	}
 }

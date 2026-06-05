@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/arvlas/url-shortener/api/internal/domain"
@@ -71,7 +72,7 @@ func TestShorten_InvalidURL(t *testing.T) {
 	svc := service.NewURLService(&mockURLRepo{}, &mockClickRepo{}, nil)
 
 	_, err := svc.Shorten(context.Background(), "not-a-url", "")
-	if err != domain.ErrInvalidURL {
+	if !errors.Is(err, domain.ErrInvalidURL) {
 		t.Fatalf("expected ErrInvalidURL, got %v", err)
 	}
 }
@@ -80,7 +81,7 @@ func TestShorten_InvalidScheme(t *testing.T) {
 	svc := service.NewURLService(&mockURLRepo{}, &mockClickRepo{}, nil)
 
 	_, err := svc.Shorten(context.Background(), "ftp://example.com/file.txt", "")
-	if err != domain.ErrInvalidURL {
+	if !errors.Is(err, domain.ErrInvalidURL) {
 		t.Fatalf("expected ErrInvalidURL, got %v", err)
 	}
 }
@@ -116,7 +117,7 @@ func TestShorten_CustomSlug_Conflict(t *testing.T) {
 	svc := service.NewURLService(urlRepo, &mockClickRepo{}, nil)
 
 	_, err := svc.Shorten(context.Background(), "https://example.com", "myslug")
-	if err != domain.ErrSlugConflict {
+	if !errors.Is(err, domain.ErrSlugConflict) {
 		t.Fatalf("expected ErrSlugConflict, got %v", err)
 	}
 }
@@ -130,7 +131,7 @@ func TestGet_NotFound(t *testing.T) {
 	svc := service.NewURLService(urlRepo, &mockClickRepo{}, nil)
 
 	_, err := svc.Get(context.Background(), "missing")
-	if err != domain.ErrURLNotFound {
+	if !errors.Is(err, domain.ErrURLNotFound) {
 		t.Fatalf("expected ErrURLNotFound, got %v", err)
 	}
 }
@@ -162,7 +163,7 @@ func TestResolve_NotFound(t *testing.T) {
 	svc := service.NewURLService(urlRepo, &mockClickRepo{}, nil)
 
 	_, err := svc.Resolve(context.Background(), "gone")
-	if err != domain.ErrURLNotFound {
+	if !errors.Is(err, domain.ErrURLNotFound) {
 		t.Fatalf("expected ErrURLNotFound, got %v", err)
 	}
 }

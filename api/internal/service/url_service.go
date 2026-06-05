@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/url"
@@ -24,7 +25,8 @@ func NewURLService(urlRepo domain.URLRepository, clickRepo domain.ClickRepositor
 }
 
 func (s *urlService) Shorten(ctx context.Context, originalURL, customSlug string) (*domain.URL, error) {
-	if err := validateURL(originalURL); err != nil {
+	err := validateURL(originalURL)
+	if err != nil {
 		return nil, domain.ErrInvalidURL
 	}
 
@@ -36,11 +38,13 @@ func (s *urlService) Shorten(ctx context.Context, originalURL, customSlug string
 	}
 
 	u := &domain.URL{Slug: slug, OriginalURL: originalURL}
-	if err := s.urlRepo.Create(ctx, u); err != nil {
-		if err == domain.ErrSlugConflict && customSlug == "" {
+	err = s.urlRepo.Create(ctx, u)
+	if err != nil {
+		if errors.Is(err, domain.ErrSlugConflict) && customSlug == "" {
 			u.Slug = generateSlug()
-			if err2 := s.urlRepo.Create(ctx, u); err2 != nil {
-				return nil, err2
+			err = s.urlRepo.Create(ctx, u)
+			if err != nil {
+				return nil, err
 			}
 			return u, nil
 		}
@@ -58,7 +62,7 @@ func (s *urlService) Resolve(ctx context.Context, slug string) (*domain.URL, err
 	if err != nil {
 		return nil, err
 	}
-	go func() {
+	go func() { //nolint:gosec // intentional: click counting must outlive the request context
 		bgCtx := context.Background()
 		_ = s.clickRepo.Record(bgCtx, &domain.Click{URLID: u.ID})
 		_ = s.urlRepo.IncrementClickCount(bgCtx, slug)
@@ -122,7 +126,8 @@ func (s *urlService) streamSlugs(ctx context.Context, originalURL string, ch cha
 			}
 		}
 	}
-	if err := stream.Err(); err != nil {
+	err := stream.Err()
+	if err != nil {
 		slog.Error("suggest stream", "error", err)
 		return
 	}
@@ -130,7 +135,8 @@ func (s *urlService) streamSlugs(ctx context.Context, originalURL string, ch cha
 	var result struct {
 		Candidates []string `json:"candidates"`
 	}
-	if err := json.Unmarshal([]byte(jsonBuf), &result); err != nil {
+	err = json.Unmarshal([]byte(jsonBuf), &result)
+	if err != nil {
 		slog.Error("suggest parse", "error", err, "json", jsonBuf)
 		return
 	}

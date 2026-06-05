@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -26,9 +27,10 @@ func RunMigrations(pool *pgxpool.Pool) error {
 	if err != nil {
 		return fmt.Errorf("migrate.New: %w", err)
 	}
-	defer m.Close()
+	defer func() { _, _ = m.Close() }()
 
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+	err = m.Up()
+	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return fmt.Errorf("migrate.Up: %w", err)
 	}
 	return nil

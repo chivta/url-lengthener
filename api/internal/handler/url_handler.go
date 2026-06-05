@@ -18,7 +18,8 @@ func (h *urlHandler) ShortenURL(c *gin.Context) {
 		URL        string `json:"url"         binding:"required"`
 		CustomSlug string `json:"custom_slug"`
 	}
-	if err := c.ShouldBindJSON(&req); err != nil {
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
 		writeError(c, domain.ErrInvalidURL)
 		return
 	}
@@ -40,7 +41,8 @@ func (h *urlHandler) GetURL(c *gin.Context) {
 }
 
 func (h *urlHandler) DeleteURL(c *gin.Context) {
-	if err := h.svc.Delete(c.Request.Context(), c.Param("slug")); err != nil {
+	err := h.svc.Delete(c.Request.Context(), c.Param("slug"))
+	if err != nil {
 		writeError(c, err)
 		return
 	}
@@ -60,7 +62,8 @@ func (h *urlHandler) SuggestSlugs(c *gin.Context) {
 	var req struct {
 		URL string `json:"url" binding:"required"`
 	}
-	if err := c.ShouldBindJSON(&req); err != nil {
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
 		writeError(c, domain.ErrInvalidURL)
 		return
 	}
@@ -76,9 +79,9 @@ func (h *urlHandler) SuggestSlugs(c *gin.Context) {
 	c.Header("X-Accel-Buffering", "no")
 
 	for slug := range ch {
-		fmt.Fprintf(c.Writer, "data: %s\n\n", slug)
+		_, _ = fmt.Fprintf(c.Writer, "data: %s\n\n", slug)
 		c.Writer.Flush()
 	}
-	fmt.Fprintf(c.Writer, "event: done\ndata: \n\n")
+	_, _ = fmt.Fprintf(c.Writer, "event: done\ndata: \n\n")
 	c.Writer.Flush()
 }
