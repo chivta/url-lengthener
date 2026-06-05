@@ -70,7 +70,7 @@ jobs:
           go-version-file: api/go.mod
           cache-dependency-path: api/go.sum
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           working-directory: api
           version: v2.12.2
