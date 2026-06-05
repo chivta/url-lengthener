@@ -1,4 +1,4 @@
-import { useState, useTransition } from 'react'
+import React, { useState, useTransition } from 'react'
 import strings from '../i18n'
 import { APIError, ShortenRequest, URLRecord, shortenURL } from '../api/urls'
 import { streamSuggestions } from '../api/suggest'
