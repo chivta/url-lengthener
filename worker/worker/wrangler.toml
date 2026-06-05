@@ -1,0 +1,18 @@
+name = "url-shortener-worker"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "URL_KV"
+id = "placeholder-kv-id"
+
+[[durable_objects.bindings]]
+name = "CLICK_COUNTER"
+class_name = "ClickCounter"
+
+[[r2_buckets]]
+binding = "QR_BUCKET"
+bucket_name = "url-shortener-qr"
+
+[vars]
+API_BASE_URL = "http://localhost:8080"
