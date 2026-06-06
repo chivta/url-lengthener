@@ -1,4 +1,4 @@
-# URL Shortener
+# URL lengthener
 
 Learning project covering Go, React+Vite, Cloudflare Workers, AWS/EKS, Terraform, and Claude AI.
 

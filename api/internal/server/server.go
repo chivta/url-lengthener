@@ -13,10 +13,10 @@ import (
 	"github.com/anthropics/anthropic-sdk-go/option"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/arvlas/url-shortener/api/internal/config"
-	"github.com/arvlas/url-shortener/api/internal/handler"
-	"github.com/arvlas/url-shortener/api/internal/repository"
-	"github.com/arvlas/url-shortener/api/internal/service"
+	"github.com/arvlas/url-lengthener/api/internal/config"
+	"github.com/arvlas/url-lengthener/api/internal/handler"
+	"github.com/arvlas/url-lengthener/api/internal/repository"
+	"github.com/arvlas/url-lengthener/api/internal/service"
 )
 
 type Server struct {

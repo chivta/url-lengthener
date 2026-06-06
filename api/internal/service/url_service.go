@@ -11,7 +11,7 @@ import (
 
 	"github.com/anthropics/anthropic-sdk-go"
 
-	"github.com/arvlas/url-shortener/api/internal/domain"
+	"github.com/arvlas/url-lengthener/api/internal/domain"
 )
 
 type urlService struct {

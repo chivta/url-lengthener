@@ -1,19 +1,19 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: url-shortener
-  namespace: url-shortener
+  name: url-lengthener
+  namespace: url-lengthener
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   tls:
     - hosts:
-        - shortener.example.com
-        - api.shortener.example.com
-      secretName: url-shortener-tls
+        - lengthener.example.com
+        - api.lengthener.example.com
+      secretName: url-lengthener-tls
   rules:
-    - host: api.shortener.example.com
+    - host: api.lengthener.example.com
       http:
         paths:
           - path: /
@@ -23,7 +23,7 @@ spec:
                 name: api
                 port:
                   number: 8080
-    - host: shortener.example.com
+    - host: lengthener.example.com
       http:
         paths:
           - path: /

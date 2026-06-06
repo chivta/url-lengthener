@@ -8,9 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/arvlas/url-shortener/api/internal/config"
-	"github.com/arvlas/url-shortener/api/internal/domain"
-	"github.com/arvlas/url-shortener/api/internal/handler"
+	"github.com/arvlas/url-lengthener/api/internal/config"
+	"github.com/arvlas/url-lengthener/api/internal/domain"
+	"github.com/arvlas/url-lengthener/api/internal/handler"
 )
 
 type mockURLService struct {

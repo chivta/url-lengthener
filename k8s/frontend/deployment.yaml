@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: url-shortener
+  namespace: url-lengthener
 spec:
   replicas: 2
   selector:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ECR_REGISTRY/url-shortener-frontend:IMAGE_TAG
+          image: ECR_REGISTRY/url-lengthener-frontend:IMAGE_TAG
           ports:
             - containerPort: 80
           resources:

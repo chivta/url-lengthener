@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/arvlas/url-shortener/api/internal/config"
-	"github.com/arvlas/url-shortener/api/internal/domain"
+	"github.com/arvlas/url-lengthener/api/internal/config"
+	"github.com/arvlas/url-lengthener/api/internal/domain"
 )
 
 func NewRouter(cfg *config.Config, svc domain.URLService) http.Handler {

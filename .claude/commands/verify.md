@@ -1,4 +1,4 @@
-Smoke-test the running URL shortener stack end-to-end. Assumes `/run` has already been executed and all services are up.
+Smoke-test the running URL lengthener stack end-to-end. Assumes `/run` has already been executed and all services are up.
 
 If `$ARGUMENTS` names a specific area (e.g. `redirect`, `ai`, `analytics`, `frontend`), run only that section. Otherwise run all sections in order.
 

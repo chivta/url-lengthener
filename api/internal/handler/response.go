@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/arvlas/url-shortener/api/internal/domain"
+	"github.com/arvlas/url-lengthener/api/internal/domain"
 )
 
 func writeError(c *gin.Context, err error) {

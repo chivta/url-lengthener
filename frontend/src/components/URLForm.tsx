@@ -1,6 +1,6 @@
 import React, { useState, useTransition } from 'react'
 import strings from '../i18n'
-import { APIError, ShortenRequest, URLRecord, shortenURL } from '../api/urls'
+import { APIError, LengthenRequest, URLRecord, lengthenURL } from '../api/urls'
 import { streamSuggestions } from '../api/suggest'
 import SlugPicker from './SlugPicker'
 
@@ -30,9 +30,9 @@ export default function URLForm({ onResult }: Props) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
-    const req: ShortenRequest = { url, custom_slug: customSlug || undefined }
+    const req: LengthenRequest = { url, custom_slug: customSlug || undefined }
     startTransition(() => {
-      shortenURL(req)
+      lengthenURL(req)
         .then(onResult)
         .catch((err) => {
           if (err instanceof APIError) {

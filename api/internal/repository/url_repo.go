@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/arvlas/url-shortener/api/internal/domain"
+	"github.com/arvlas/url-lengthener/api/internal/domain"
 )
 
 type urlRepo struct {

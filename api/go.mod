@@ -1,4 +1,4 @@
-module github.com/arvlas/url-shortener/api
+module github.com/arvlas/url-lengthener/api
 
 go 1.25.0
 

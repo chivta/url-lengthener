@@ -4,7 +4,7 @@ import URLForm from '../components/URLForm'
 import ResultCard from '../components/ResultCard'
 import { URLRecord } from '../api/urls'
 
-export default function ShortenPage() {
+export default function LengthenPage() {
   const [result, setResult] = useState<URLRecord | null>(null)
 
   return (

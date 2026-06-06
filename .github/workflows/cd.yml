@@ -35,9 +35,9 @@ jobs:
           SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           docker build --target prod \
-            -t $REGISTRY/url-shortener-api:$SHA \
+            -t $REGISTRY/url-lengthener-api:$SHA \
             api/
-          docker push $REGISTRY/url-shortener-api:$SHA
+          docker push $REGISTRY/url-lengthener-api:$SHA
 
       - name: Build and push frontend image
         env:
@@ -46,18 +46,18 @@ jobs:
         run: |
           docker build --target prod \
             --build-arg VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL_PROD }} \
-            -t $REGISTRY/url-shortener-frontend:$SHA \
+            -t $REGISTRY/url-lengthener-frontend:$SHA \
             frontend/
-          docker push $REGISTRY/url-shortener-frontend:$SHA
+          docker push $REGISTRY/url-lengthener-frontend:$SHA
 
       - name: Update manifests
         env:
           REGISTRY: ${{ steps.ecr.outputs.registry }}
           SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
-          sed -i "s|ECR_REGISTRY/url-shortener-api:IMAGE_TAG|$REGISTRY/url-shortener-api:$SHA|g" \
+          sed -i "s|ECR_REGISTRY/url-lengthener-api:IMAGE_TAG|$REGISTRY/url-lengthener-api:$SHA|g" \
             manifests/api/deployment.yaml
-          sed -i "s|ECR_REGISTRY/url-shortener-frontend:IMAGE_TAG|$REGISTRY/url-shortener-frontend:$SHA|g" \
+          sed -i "s|ECR_REGISTRY/url-lengthener-frontend:IMAGE_TAG|$REGISTRY/url-lengthener-frontend:$SHA|g" \
             manifests/frontend/deployment.yaml
 
       - name: Commit manifests

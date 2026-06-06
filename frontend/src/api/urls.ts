@@ -10,12 +10,12 @@ export interface URLRecord {
   created_at: string
 }
 
-export interface ShortenRequest {
+export interface LengthenRequest {
   url: string
   custom_slug?: string
 }
 
-export async function shortenURL(req: ShortenRequest): Promise<URLRecord> {
+export async function lengthenURL(req: LengthenRequest): Promise<URLRecord> {
   const res = await fetch(`${base}/api/v1/urls`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

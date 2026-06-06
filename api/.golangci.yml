@@ -22,4 +22,4 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/arvlas/url-shortener
+        - github.com/arvlas/url-lengthener

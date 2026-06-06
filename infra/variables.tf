@@ -9,7 +9,7 @@ variable "environment" {
 
 variable "project" {
   type    = string
-  default = "url-shortener"
+  default = "url-lengthener"
 }
 
 variable "eks_node_instance_type" {

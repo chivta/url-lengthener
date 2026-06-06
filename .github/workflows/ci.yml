@@ -13,9 +13,9 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_USER: urlshortener
-          POSTGRES_PASSWORD: urlshortener
-          POSTGRES_DB: urlshortener
+          POSTGRES_USER: urllengthener
+          POSTGRES_PASSWORD: urllengthener
+          POSTGRES_DB: urllengthener
         ports:
           - 5432:5432
         options: >-
@@ -32,7 +32,7 @@ jobs:
       - name: Test
         working-directory: api
         env:
-          DATABASE_URL: postgres://urlshortener:urlshortener@localhost:5432/urlshortener?sslmode=disable
+          DATABASE_URL: postgres://urllengthener:urllengthener@localhost:5432/urllengthener?sslmode=disable
           REDIS_URL: redis://localhost:6379
           ANTHROPIC_API_KEY: test-key
           ALLOWED_ORIGINS: http://localhost:5173

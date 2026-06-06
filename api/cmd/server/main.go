@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/arvlas/url-shortener/api/internal/config"
-	"github.com/arvlas/url-shortener/api/internal/server"
+	"github.com/arvlas/url-lengthener/api/internal/config"
+	"github.com/arvlas/url-lengthener/api/internal/server"
 )
 
 func main() {

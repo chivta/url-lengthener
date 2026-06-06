@@ -1,4 +1,4 @@
-Start the full local development stack for the URL shortener and confirm every service is reachable.
+Start the full local development stack for the URL lengthener and confirm every service is reachable.
 
 ## Steps
 

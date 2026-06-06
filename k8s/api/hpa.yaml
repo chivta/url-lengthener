@@ -2,7 +2,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: api
-  namespace: url-shortener
+  namespace: url-lengthener
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

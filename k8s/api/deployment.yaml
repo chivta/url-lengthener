@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api
-  namespace: url-shortener
+  namespace: url-lengthener
 spec:
   replicas: 2
   selector:
@@ -15,29 +15,29 @@ spec:
     spec:
       containers:
         - name: api
-          image: ECR_REGISTRY/url-shortener-api:IMAGE_TAG
+          image: ECR_REGISTRY/url-lengthener-api:IMAGE_TAG
           ports:
             - containerPort: 8080
           env:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: url-shortener-secrets
+                  name: url-lengthener-secrets
                   key: database-url
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
-                  name: url-shortener-secrets
+                  name: url-lengthener-secrets
                   key: redis-url
             - name: ANTHROPIC_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: url-shortener-secrets
+                  name: url-lengthener-secrets
                   key: anthropic-api-key
             - name: ALLOWED_ORIGINS
               valueFrom:
                 secretKeyRef:
-                  name: url-shortener-secrets
+                  name: url-lengthener-secrets
                   key: allowed-origins
             - name: ENVIRONMENT
               value: production

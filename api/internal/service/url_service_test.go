@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/arvlas/url-shortener/api/internal/domain"
-	"github.com/arvlas/url-shortener/api/internal/service"
+	"github.com/arvlas/url-lengthener/api/internal/domain"
+	"github.com/arvlas/url-lengthener/api/internal/service"
 )
 
 type mockURLRepo struct {

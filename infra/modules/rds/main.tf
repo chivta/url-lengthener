@@ -31,8 +31,8 @@ resource "aws_db_instance" "this" {
   storage_type      = "gp3"
   storage_encrypted = true
 
-  db_name  = "urlshortener"
-  username = "urlshortener"
+  db_name  = "urllengthener"
+  username = "urllengthener"
   password = var.db_password
 
   db_subnet_group_name   = aws_db_subnet_group.this.name
