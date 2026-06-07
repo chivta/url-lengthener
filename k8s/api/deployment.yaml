@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: ECR_REGISTRY/url-lengthener-api:IMAGE_TAG
+          image: url-lengthener-api
           ports:
             - containerPort: 8080
           env:

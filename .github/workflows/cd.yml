@@ -68,15 +68,18 @@ jobs:
             frontend/
           docker push $REGISTRY/url-lengthener-frontend:$IMAGE_TAG
 
+      - name: Set up kustomize
+        uses: imranismail/setup-kustomize@v2
+
       - name: Update manifests
         env:
           REGISTRY: ${{ steps.ecr.outputs.registry }}
           IMAGE_TAG: ${{ steps.vars.outputs.image_tag }}
         run: |
-          sed -i "s|ECR_REGISTRY/url-lengthener-api:IMAGE_TAG|$REGISTRY/url-lengthener-api:$IMAGE_TAG|g" \
-            manifests/api/deployment.yaml
-          sed -i "s|ECR_REGISTRY/url-lengthener-frontend:IMAGE_TAG|$REGISTRY/url-lengthener-frontend:$IMAGE_TAG|g" \
-            manifests/frontend/deployment.yaml
+          cd k8s
+          kustomize edit set image \
+            "url-lengthener-api=$REGISTRY/url-lengthener-api:$IMAGE_TAG" \
+            "url-lengthener-frontend=$REGISTRY/url-lengthener-frontend:$IMAGE_TAG"
 
       - name: Commit manifests
         env:
@@ -85,6 +88,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add manifests/api/deployment.yaml manifests/frontend/deployment.yaml
+          git add k8s/kustomization.yaml
           git diff --staged --quiet || git commit -m "deploy: $IMAGE_TAG"
           git push origin HEAD:refs/heads/$BRANCH

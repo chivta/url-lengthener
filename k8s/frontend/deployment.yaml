@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ECR_REGISTRY/url-lengthener-frontend:IMAGE_TAG
+          image: url-lengthener-frontend
           ports:
             - containerPort: 80
           resources:
