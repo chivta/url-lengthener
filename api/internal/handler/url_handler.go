@@ -26,7 +26,7 @@ func (h *urlHandler) ShortenURL(c *gin.Context) {
 	u, err := h.svc.Shorten(c.Request.Context(), req.URL, req.CustomSlug)
 	if err != nil {
 		writeError(c, err)
-		return 
+		return
 	}
 	c.JSON(http.StatusCreated, u)
 }
