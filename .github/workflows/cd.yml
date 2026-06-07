@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: [CI]
     types: [completed]
-    branches: [main]
+    branches: [main, dev]
 
 jobs:
   deploy:
@@ -19,11 +19,29 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
+      - name: Set deployment variables
+        id: vars
+        env:
+          VITE_API_BASE_URL_PROD: ${{ secrets.VITE_API_BASE_URL_PROD }}
+          VITE_API_BASE_URL_DEV: ${{ secrets.VITE_API_BASE_URL_DEV }}
+        run: |
+          SHA="${{ github.event.workflow_run.head_sha }}"
+          BRANCH="${{ github.event.workflow_run.head_branch }}"
+          if [ "$BRANCH" = "main" ]; then
+            echo "image_tag=$SHA" >> $GITHUB_OUTPUT
+            echo "workspace=prod" >> $GITHUB_OUTPUT
+            echo "vite_api_url=$VITE_API_BASE_URL_PROD" >> $GITHUB_OUTPUT
+          else
+            echo "image_tag=dev-$SHA" >> $GITHUB_OUTPUT
+            echo "workspace=dev" >> $GITHUB_OUTPUT
+            echo "vite_api_url=$VITE_API_BASE_URL_DEV" >> $GITHUB_OUTPUT
+          fi
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: us-east-1
+          aws-region: eu-west-1
 
       - name: Login to ECR
         id: ecr
@@ -32,40 +50,41 @@ jobs:
       - name: Build and push API image
         env:
           REGISTRY: ${{ steps.ecr.outputs.registry }}
-          SHA: ${{ github.event.workflow_run.head_sha }}
+          IMAGE_TAG: ${{ steps.vars.outputs.image_tag }}
         run: |
           docker build --target prod \
-            -t $REGISTRY/url-lengthener-api:$SHA \
+            -t $REGISTRY/url-lengthener-api:$IMAGE_TAG \
             api/
-          docker push $REGISTRY/url-lengthener-api:$SHA
+          docker push $REGISTRY/url-lengthener-api:$IMAGE_TAG
 
       - name: Build and push frontend image
         env:
           REGISTRY: ${{ steps.ecr.outputs.registry }}
-          SHA: ${{ github.event.workflow_run.head_sha }}
+          IMAGE_TAG: ${{ steps.vars.outputs.image_tag }}
         run: |
           docker build --target prod \
-            --build-arg VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL_PROD }} \
-            -t $REGISTRY/url-lengthener-frontend:$SHA \
+            --build-arg VITE_API_BASE_URL=${{ steps.vars.outputs.vite_api_url }} \
+            -t $REGISTRY/url-lengthener-frontend:$IMAGE_TAG \
             frontend/
-          docker push $REGISTRY/url-lengthener-frontend:$SHA
+          docker push $REGISTRY/url-lengthener-frontend:$IMAGE_TAG
 
       - name: Update manifests
         env:
           REGISTRY: ${{ steps.ecr.outputs.registry }}
-          SHA: ${{ github.event.workflow_run.head_sha }}
+          IMAGE_TAG: ${{ steps.vars.outputs.image_tag }}
         run: |
-          sed -i "s|ECR_REGISTRY/url-lengthener-api:IMAGE_TAG|$REGISTRY/url-lengthener-api:$SHA|g" \
+          sed -i "s|ECR_REGISTRY/url-lengthener-api:IMAGE_TAG|$REGISTRY/url-lengthener-api:$IMAGE_TAG|g" \
             manifests/api/deployment.yaml
-          sed -i "s|ECR_REGISTRY/url-lengthener-frontend:IMAGE_TAG|$REGISTRY/url-lengthener-frontend:$SHA|g" \
+          sed -i "s|ECR_REGISTRY/url-lengthener-frontend:IMAGE_TAG|$REGISTRY/url-lengthener-frontend:$IMAGE_TAG|g" \
             manifests/frontend/deployment.yaml
 
       - name: Commit manifests
         env:
-          SHA: ${{ github.event.workflow_run.head_sha }}
+          IMAGE_TAG: ${{ steps.vars.outputs.image_tag }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add manifests/api/deployment.yaml manifests/frontend/deployment.yaml
-          git diff --staged --quiet || git commit -m "deploy: $SHA"
-          git push
+          git diff --staged --quiet || git commit -m "deploy: $IMAGE_TAG"
+          git push origin HEAD:refs/heads/$BRANCH

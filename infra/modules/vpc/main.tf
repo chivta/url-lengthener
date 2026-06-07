@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
+  version = "~> 6.0"
 
   name = "${var.project}-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -12,6 +12,12 @@ module "vpc" {
   enable_nat_gateway   = true
   single_nat_gateway   = true
   enable_dns_hostnames = true
+  enable_dns_support = true
+
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+  }
 
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb" = 1

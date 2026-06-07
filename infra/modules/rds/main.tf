@@ -14,11 +14,9 @@ resource "aws_security_group" "rds" {
     security_groups = [var.eks_node_sg_id]
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+  tags = {
+    Project     = var.project
+    Environment = var.environment
   }
 }
 
@@ -41,4 +39,9 @@ resource "aws_db_instance" "this" {
   skip_final_snapshot     = true
   backup_retention_period = 7
   deletion_protection     = false
+
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+  }
 }

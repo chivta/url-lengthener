@@ -1,5 +1,10 @@
 resource "aws_s3_bucket" "qr" {
   bucket = "${var.project}-${var.environment}-qr"
+
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "qr" {

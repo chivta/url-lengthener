@@ -51,6 +51,16 @@ Starts api, frontend with hot reload in dev mode
 | `PORT` | no | `8080` | |
 | `ENVIRONMENT` | no | `development` | `production` enables Gin release mode |
 
+## GitHub Actions secrets
+
+CI/CD workflows (`.github/workflows/`) require the following repository secrets to be configured (Settings → Secrets and variables → Actions):
+
+| Secret | Used by | Notes |
+|---|---|---|
+| `AWS_ROLE_ARN` | CD | IAM role assumed via OIDC for ECR push and manifest commits — no static AWS credentials |
+| `VITE_API_BASE_URL_PROD` | CD (push to `main`) | Baked into the frontend build deployed to the `prod` workspace |
+| `VITE_API_BASE_URL_DEV` | CD (push to `dev`) | Baked into the frontend build deployed to the `dev` workspace |
+
 ## Monorepo layout
 
 ```
