@@ -1,11 +1,14 @@
 name: CD
 
 on:
-  push:
-    branches: [main, dev]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
 
 jobs:
   build-and-push:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -13,6 +16,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
@@ -27,14 +32,8 @@ jobs:
       - name: Set deployment variables
         id: vars
         run: |
-          BRANCH="${{ github.ref_name }}"
-          if [ "$BRANCH" = "main" ]; then
-            echo "image_tag=${{ github.sha }}" >> "$GITHUB_OUTPUT"
-            echo "vite_api_url=${{ secrets.VITE_API_BASE_URL_PROD }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "image_tag=dev-${{ github.sha }}" >> "$GITHUB_OUTPUT"
-            echo "vite_api_url=${{ secrets.VITE_API_BASE_URL_DEV }}" >> "$GITHUB_OUTPUT"
-          fi
+          echo "image_tag=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+          echo "vite_api_url=${{ secrets.VITE_API_BASE_URL_PROD }}" >> "$GITHUB_OUTPUT"
 
       - name: Build and push API image
         env:
@@ -80,7 +79,7 @@ jobs:
       - name: Commit and push updated manifest
         env:
           IMAGE_TAG: ${{ steps.vars.outputs.image_tag }}
-          BRANCH: ${{ github.ref_name }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
