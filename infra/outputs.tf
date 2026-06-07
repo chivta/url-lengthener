@@ -8,9 +8,9 @@ output "rds_endpoint" {
 }
 
 output "ecr_api_repository_url" {
-  value = module.ecr.api_repository_url
+  value = one(module.ecr[*].api_repository_url)
 }
 
 output "ecr_frontend_repository_url" {
-  value = module.ecr.frontend_repository_url
+  value = one(module.ecr[*].frontend_repository_url)
 }
