@@ -2,18 +2,18 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - namespace.yaml
-  - api/deployment.yaml
-  - api/service.yaml
-  - api/hpa.yaml
-  - frontend/deployment.yaml
-  - frontend/service.yaml
-  - ingress.yaml
+- namespace.yaml
+- api/deployment.yaml
+- api/service.yaml
+- api/hpa.yaml
+- frontend/deployment.yaml
+- frontend/service.yaml
+- ingress.yaml
 
 images:
-  - name: url-lengthener-api
-    newName: ECR_REGISTRY/url-lengthener-api
-    newTag: IMAGE_TAG
-  - name: url-lengthener-frontend
-    newName: ECR_REGISTRY/url-lengthener-frontend
-    newTag: IMAGE_TAG
+- name: url-lengthener-api
+  newName: 235336959928.dkr.ecr.eu-west-1.amazonaws.com/url-lengthener-api
+  newTag: f997a46faf3e1449b1531b4156b2c4e50e48569f
+- name: url-lengthener-frontend
+  newName: 235336959928.dkr.ecr.eu-west-1.amazonaws.com/url-lengthener-frontend
+  newTag: f997a46faf3e1449b1531b4156b2c4e50e48569f
