@@ -1,15 +1,19 @@
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.0"
+  version = "~> 21.0"
 
-  cluster_name    = "${var.project}-${var.environment}"
-  cluster_version = "1.31"
+  name    = "${var.project}-${var.environment}"
+  kubernetes_version = "1.33"
 
   vpc_id                         = var.vpc_id
   subnet_ids                     = var.private_subnet_ids
-  cluster_endpoint_public_access = true
+  endpoint_public_access = true
+  enable_cluster_creator_admin_permissions = true
 
-  enable_irsa = true
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+  }
 
   eks_managed_node_groups = {
     default = {

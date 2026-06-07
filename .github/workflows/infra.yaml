@@ -1,0 +1,52 @@
+name: Infra
+
+on:
+  workflow_run:
+    workflows: [CD]
+    types: [completed]
+    branches: [main]
+
+env:
+  AWS_REGION: eu-west-1
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Terraform init
+        working-directory: infra
+        run: terraform init
+
+      - name: Terraform select prod workspace
+        working-directory: infra
+        run: terraform workspace select prod
+
+      - name: Terraform apply
+        working-directory: infra
+        env:
+          TF_VAR_db_password: ${{ secrets.TF_VAR_db_password }}
+        run: terraform apply -auto-approve
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name url-lengthener-prod --region ${{ env.AWS_REGION }}
+
+      - name: Deploy manifests
+        run: kubectl apply -k k8s/

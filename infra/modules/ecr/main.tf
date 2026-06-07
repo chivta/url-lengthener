@@ -5,6 +5,10 @@ resource "aws_ecr_repository" "api" {
   image_scanning_configuration {
     scan_on_push = true
   }
+
+  tags = {
+    Project = var.project
+  }
 }
 
 resource "aws_ecr_repository" "frontend" {
@@ -13,6 +17,10 @@ resource "aws_ecr_repository" "frontend" {
 
   image_scanning_configuration {
     scan_on_push = true
+  }
+
+  tags = {
+    Project = var.project
   }
 }
 
