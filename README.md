@@ -57,9 +57,10 @@ CI/CD workflows (`.github/workflows/`) require the following repository secrets 
 
 | Secret | Used by | Notes |
 |---|---|---|
-| `AWS_ROLE_ARN` | CD | IAM role assumed via OIDC for ECR push and manifest commits — no static AWS credentials |
+| `AWS_ROLE_ARN` | CD, Infra | IAM role assumed via OIDC for ECR push, manifest commits, Terraform apply, and EKS access — no static AWS credentials |
 | `VITE_API_BASE_URL_PROD` | CD (push to `main`) | Baked into the frontend build deployed to the `prod` workspace |
 | `VITE_API_BASE_URL_DEV` | CD (push to `dev`) | Baked into the frontend build deployed to the `dev` workspace |
+| `TF_VAR_db_password` | Infra | RDS password, passed to `terraform apply` as the `db_password` Terraform variable |
 
 ## Monorepo layout
 
@@ -69,5 +70,5 @@ frontend/   React + Vite app
 worker/     Cloudflare Worker
 infra/      Terraform (EKS, RDS, ElastiCache, ECR)
 k8s/        Kubernetes manifests (GitOps target)
-.github/    CI (test/lint) + CD (build & deploy)
+.github/    CI (test/lint) + CD (build & push images, update manifests) + Infra (terraform apply, k8s deploy)
 ```
