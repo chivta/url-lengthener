@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
 - namespace.yaml
+- cluster-issuer.yaml
 - api/deployment.yaml
 - api/service.yaml
 - api/hpa.yaml
