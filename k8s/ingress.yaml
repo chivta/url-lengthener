@@ -4,9 +4,9 @@ metadata:
   name: url-lengthener
   namespace: url-lengthener
   annotations:
-    kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  ingressClassName: traefik
   tls:
     - hosts:
         - yet-another-overengineered-url-shortener-learning.project-except-its-actually-lengthening-urls-this-time-so-the.domain-has-to-be-255-symbols-in-total-and.reach-rfc2181-domain-name-length-limit.confusing-anyone-who-encounters-this-saas-online.chivtar.dev
