@@ -7,24 +7,22 @@ import (
 )
 
 type Config struct {
-	DatabaseURL     string
-	RedisURL        string
-	Port            string
-	AnthropicAPIKey string
-	AllowedOrigins  string
-	Environment     string
-	LogLevel        string
+	DatabaseURL    string
+	RedisURL       string
+	Port           string
+	AllowedOrigins string
+	Environment    string
+	LogLevel       string
 }
 
 func Load() (*Config, error) {
 	cfg := &Config{
-		DatabaseURL:     os.Getenv("DATABASE_URL"),
-		RedisURL:        os.Getenv("REDIS_URL"),
-		Port:            getEnvOrDefault("PORT", "8080"),
-		AnthropicAPIKey: os.Getenv("ANTHROPIC_API_KEY"),
-		AllowedOrigins:  os.Getenv("ALLOWED_ORIGINS"),
-		Environment:     getEnvOrDefault("ENVIRONMENT", "development"),
-		LogLevel:        getEnvOrDefault("LOG_LEVEL", "info"),
+		DatabaseURL:    os.Getenv("DATABASE_URL"),
+		RedisURL:       os.Getenv("REDIS_URL"),
+		Port:           getEnvOrDefault("PORT", "8080"),
+		AllowedOrigins: os.Getenv("ALLOWED_ORIGINS"),
+		Environment:    getEnvOrDefault("ENVIRONMENT", "development"),
+		LogLevel:       getEnvOrDefault("LOG_LEVEL", "info"),
 	}
 
 	var missing []string
@@ -33,9 +31,6 @@ func Load() (*Config, error) {
 	}
 	if cfg.RedisURL == "" {
 		missing = append(missing, "REDIS_URL")
-	}
-	if cfg.AnthropicAPIKey == "" {
-		missing = append(missing, "ANTHROPIC_API_KEY")
 	}
 	if cfg.AllowedOrigins == "" {
 		missing = append(missing, "ALLOWED_ORIGINS")

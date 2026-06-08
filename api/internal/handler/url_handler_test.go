@@ -14,11 +14,10 @@ import (
 )
 
 type mockURLService struct {
-	shortenFn      func(ctx context.Context, originalURL, customSlug string) (*domain.URL, error)
-	getFn          func(ctx context.Context, slug string) (*domain.URL, error)
-	resolveFn      func(ctx context.Context, slug string) (*domain.URL, error)
-	deleteFn       func(ctx context.Context, slug string) error
-	suggestSlugsFn func(ctx context.Context, originalURL string) (<-chan string, error)
+	shortenFn func(ctx context.Context, originalURL, customSlug string) (*domain.URL, error)
+	getFn     func(ctx context.Context, slug string) (*domain.URL, error)
+	resolveFn func(ctx context.Context, slug string) (*domain.URL, error)
+	deleteFn  func(ctx context.Context, slug string) error
 }
 
 func (m *mockURLService) Shorten(ctx context.Context, originalURL, customSlug string) (*domain.URL, error) {
@@ -47,15 +46,6 @@ func (m *mockURLService) Delete(ctx context.Context, slug string) error {
 		return m.deleteFn(ctx, slug)
 	}
 	return nil
-}
-
-func (m *mockURLService) SuggestSlugs(ctx context.Context, originalURL string) (<-chan string, error) {
-	if m.suggestSlugsFn != nil {
-		return m.suggestSlugsFn(ctx, originalURL)
-	}
-	ch := make(chan string)
-	close(ch)
-	return ch, nil
 }
 
 func newTestRouter(svc domain.URLService) http.Handler {

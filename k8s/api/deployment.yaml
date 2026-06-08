@@ -29,11 +29,6 @@ spec:
                 secretKeyRef:
                   name: url-lengthener-secrets
                   key: redis-url
-            - name: ANTHROPIC_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: url-lengthener-secrets
-                  key: anthropic-api-key
             - name: ALLOWED_ORIGINS
               valueFrom:
                 secretKeyRef:

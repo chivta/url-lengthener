@@ -57,7 +57,7 @@ func (m *mockClickRepo) Record(ctx context.Context, click *domain.Click) error {
 
 func TestShorten_Success(t *testing.T) {
 	urlRepo := &mockURLRepo{}
-	svc := service.NewURLService(urlRepo, &mockClickRepo{}, nil)
+	svc := service.NewURLService(urlRepo, &mockClickRepo{})
 
 	u, err := svc.Shorten(context.Background(), "https://example.com", "")
 	if err != nil {
@@ -69,7 +69,7 @@ func TestShorten_Success(t *testing.T) {
 }
 
 func TestShorten_InvalidURL(t *testing.T) {
-	svc := service.NewURLService(&mockURLRepo{}, &mockClickRepo{}, nil)
+	svc := service.NewURLService(&mockURLRepo{}, &mockClickRepo{})
 
 	_, err := svc.Shorten(context.Background(), "not-a-url", "")
 	if !errors.Is(err, domain.ErrInvalidURL) {
@@ -78,7 +78,7 @@ func TestShorten_InvalidURL(t *testing.T) {
 }
 
 func TestShorten_InvalidScheme(t *testing.T) {
-	svc := service.NewURLService(&mockURLRepo{}, &mockClickRepo{}, nil)
+	svc := service.NewURLService(&mockURLRepo{}, &mockClickRepo{})
 
 	_, err := svc.Shorten(context.Background(), "ftp://example.com/file.txt", "")
 	if !errors.Is(err, domain.ErrInvalidURL) {
@@ -97,7 +97,7 @@ func TestShorten_SlugConflict_RetrySucceeds(t *testing.T) {
 			return nil
 		},
 	}
-	svc := service.NewURLService(urlRepo, &mockClickRepo{}, nil)
+	svc := service.NewURLService(urlRepo, &mockClickRepo{})
 
 	_, err := svc.Shorten(context.Background(), "https://example.com", "")
 	if err != nil {
@@ -114,7 +114,7 @@ func TestShorten_CustomSlug_Conflict(t *testing.T) {
 			return domain.ErrSlugConflict
 		},
 	}
-	svc := service.NewURLService(urlRepo, &mockClickRepo{}, nil)
+	svc := service.NewURLService(urlRepo, &mockClickRepo{})
 
 	_, err := svc.Shorten(context.Background(), "https://example.com", "myslug")
 	if !errors.Is(err, domain.ErrSlugConflict) {
@@ -128,7 +128,7 @@ func TestGet_NotFound(t *testing.T) {
 			return nil, domain.ErrURLNotFound
 		},
 	}
-	svc := service.NewURLService(urlRepo, &mockClickRepo{}, nil)
+	svc := service.NewURLService(urlRepo, &mockClickRepo{})
 
 	_, err := svc.Get(context.Background(), "missing")
 	if !errors.Is(err, domain.ErrURLNotFound) {
@@ -143,7 +143,7 @@ func TestResolve_Success(t *testing.T) {
 			return want, nil
 		},
 	}
-	svc := service.NewURLService(urlRepo, &mockClickRepo{}, nil)
+	svc := service.NewURLService(urlRepo, &mockClickRepo{})
 
 	got, err := svc.Resolve(context.Background(), "abc123")
 	if err != nil {
@@ -160,7 +160,7 @@ func TestResolve_NotFound(t *testing.T) {
 			return nil, domain.ErrURLNotFound
 		},
 	}
-	svc := service.NewURLService(urlRepo, &mockClickRepo{}, nil)
+	svc := service.NewURLService(urlRepo, &mockClickRepo{})
 
 	_, err := svc.Resolve(context.Background(), "gone")
 	if !errors.Is(err, domain.ErrURLNotFound) {
@@ -169,7 +169,7 @@ func TestResolve_NotFound(t *testing.T) {
 }
 
 func TestDelete_Success(t *testing.T) {
-	svc := service.NewURLService(&mockURLRepo{}, &mockClickRepo{}, nil)
+	svc := service.NewURLService(&mockURLRepo{}, &mockClickRepo{})
 
 	err := svc.Delete(context.Background(), "abc123")
 	if err != nil {

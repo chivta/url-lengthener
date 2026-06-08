@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -56,32 +55,4 @@ func (h *urlHandler) RedirectURL(c *gin.Context) {
 		return
 	}
 	c.Redirect(http.StatusMovedPermanently, u.OriginalURL)
-}
-
-func (h *urlHandler) SuggestSlugs(c *gin.Context) {
-	var req struct {
-		URL string `json:"url" binding:"required"`
-	}
-	err := c.ShouldBindJSON(&req)
-	if err != nil {
-		writeError(c, domain.ErrInvalidURL)
-		return
-	}
-
-	ch, err := h.svc.SuggestSlugs(c.Request.Context(), req.URL)
-	if err != nil {
-		writeError(c, err)
-		return
-	}
-
-	c.Header("Content-Type", "text/event-stream")
-	c.Header("Cache-Control", "no-cache")
-	c.Header("X-Accel-Buffering", "no")
-
-	for slug := range ch {
-		_, _ = fmt.Fprintf(c.Writer, "data: %s\n\n", slug)
-		c.Writer.Flush()
-	}
-	_, _ = fmt.Fprintf(c.Writer, "event: done\ndata: \n\n")
-	c.Writer.Flush()
 }

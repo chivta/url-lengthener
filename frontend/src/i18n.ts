@@ -12,7 +12,6 @@ const strings = {
       placeholder: 'my-slug',
     },
     submit: 'Lengthen',
-    suggest: 'Suggest slugs',
   },
   result: {
     longUrl: 'Your long URL',

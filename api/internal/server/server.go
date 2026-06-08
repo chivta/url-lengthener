@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/anthropics/anthropic-sdk-go"
-	"github.com/anthropics/anthropic-sdk-go/option"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/arvlas/url-lengthener/api/internal/config"
@@ -50,8 +48,7 @@ func (s *Server) Run(ctx context.Context) error {
 	urlRepo := repository.NewURLRepo(pool)
 	clickRepo := repository.NewClickRepo(pool)
 
-	claudeClient := anthropic.NewClient(option.WithAPIKey(s.cfg.AnthropicAPIKey))
-	svc := service.NewURLService(urlRepo, clickRepo, &claudeClient)
+	svc := service.NewURLService(urlRepo, clickRepo)
 
 	router := handler.NewRouter(s.cfg, svc)
 

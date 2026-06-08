@@ -23,7 +23,6 @@ func NewRouter(cfg *config.Config, svc domain.URLService) http.Handler {
 
 	h := &urlHandler{svc: svc}
 	v1 := r.Group("/api/v1")
-	v1.POST("/urls/suggest", h.SuggestSlugs)
 	v1.POST("/urls", h.ShortenURL)
 	v1.GET("/urls/:slug", h.GetURL)
 	v1.DELETE("/urls/:slug", h.DeleteURL)

@@ -1,8 +1,6 @@
 import React, { useState, useTransition } from 'react'
 import strings from '../i18n'
 import { APIError, LengthenRequest, URLRecord, lengthenURL } from '../api/urls'
-import { streamSuggestions } from '../api/suggest'
-import SlugPicker from './SlugPicker'
 
 interface Props {
   onResult: (record: URLRecord) => void
@@ -11,21 +9,8 @@ interface Props {
 export default function URLForm({ onResult }: Props) {
   const [url, setUrl] = useState('')
   const [customSlug, setCustomSlug] = useState('')
-  const [suggestions, setSuggestions] = useState<string[]>([])
-  const [suggesting, setSuggesting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
-
-  function handleSuggest() {
-    if (!url) return
-    setSuggestions([])
-    setSuggesting(true)
-    streamSuggestions(
-      url,
-      (slug) => setSuggestions((prev) => [...prev, slug]),
-      () => setSuggesting(false),
-    )
-  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -59,26 +44,14 @@ export default function URLForm({ onResult }: Props) {
       </div>
       <div>
         <label style={{ display: 'block', marginBottom: '0.25rem' }}>{strings.form.customSlug.label}</label>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <input
-            type="text"
-            value={customSlug}
-            onChange={(e) => setCustomSlug(e.target.value)}
-            placeholder={strings.form.customSlug.placeholder}
-            style={{ flex: 1, padding: '0.5rem', fontSize: '1rem' }}
-          />
-          <button type="button" onClick={handleSuggest} disabled={!url || suggesting}>
-            {strings.form.suggest}
-          </button>
-        </div>
-      </div>
-      {(suggestions.length > 0 || suggesting) && (
-        <SlugPicker
-          candidates={suggestions}
-          loading={suggesting}
-          onSelect={(slug) => setCustomSlug(slug)}
+        <input
+          type="text"
+          value={customSlug}
+          onChange={(e) => setCustomSlug(e.target.value)}
+          placeholder={strings.form.customSlug.placeholder}
+          style={{ width: '100%', padding: '0.5rem', fontSize: '1rem', boxSizing: 'border-box' }}
         />
-      )}
+      </div>
       {error && (
         <p style={{ color: 'red', margin: 0 }}>
           {strings.error[error as keyof typeof strings.error] ?? strings.error.internal_error}

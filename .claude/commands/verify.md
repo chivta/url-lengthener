@@ -80,23 +80,7 @@ Assert:
 
 ---
 
-## 7. AI slug suggestion (if implemented)
-
-```
-POST http://localhost:8080/api/v1/urls/suggest
-Content-Type: application/json
-
-{ "url": "https://github.com/anthropics/anthropic-sdk-go" }
-```
-
-Assert:
-- Status 200
-- Response contains at least one suggested slug
-- Each suggestion is URL-safe (alphanumeric + hyphens, ≤ 12 chars)
-
----
-
-## 8. Frontend smoke test
+## 7. Frontend smoke test
 
 Use the Bash tool to fetch the frontend root and check it returns HTML:
 
@@ -108,7 +92,7 @@ Assert status 200.
 
 ---
 
-## 9. Not found handling
+## 8. Not found handling
 
 ```
 GET http://localhost:8080/api/v1/urls/doesnotexist999

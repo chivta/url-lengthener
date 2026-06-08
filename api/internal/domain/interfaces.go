@@ -18,5 +18,4 @@ type URLService interface {
 	Get(ctx context.Context, slug string) (*URL, error)
 	Resolve(ctx context.Context, slug string) (*URL, error)
 	Delete(ctx context.Context, slug string) error
-	SuggestSlugs(ctx context.Context, originalURL string) (<-chan string, error)
 }
