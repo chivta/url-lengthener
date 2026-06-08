@@ -9,23 +9,19 @@ metadata:
 spec:
   tls:
     - hosts:
-        - lengthener.example.com
-        - api.lengthener.example.com
+        - yet-another-overengineered-url-shortener-learning.project-except-its-actually-lengthening-urls-this-time-so-the.domain-has-to-be-255-symbols-in-total-and.reach-rfc2181-domain-name-length-limit.confusing-anyone-who-encounters-this-saas-online.chivtar.dev
       secretName: url-lengthener-tls
   rules:
-    - host: api.lengthener.example.com
+    - host: yet-another-overengineered-url-shortener-learning.project-except-its-actually-lengthening-urls-this-time-so-the.domain-has-to-be-255-symbols-in-total-and.reach-rfc2181-domain-name-length-limit.confusing-anyone-who-encounters-this-saas-online.chivtar.dev
       http:
         paths:
-          - path: /
+          - path: /api
             pathType: Prefix
             backend:
               service:
                 name: api
                 port:
                   number: 8080
-    - host: lengthener.example.com
-      http:
-        paths:
           - path: /
             pathType: Prefix
             backend:
