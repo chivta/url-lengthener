@@ -15,7 +15,6 @@ Fully vibe coded URL lengthener project built as a learning project covering Go,
 ## Features
 
 - Lengthen URLs with an auto-generated or custom slug
-- AI-powered slug suggestions via Claude (streamed as SSE)
 - Edge redirects via Cloudflare Worker with KV caching
 - Click counting via Cloudflare Durable Objects, flushed to Postgres every 60s
 
@@ -44,12 +43,12 @@ Starts api, frontend with hot reload in dev mode
 
 | Variable | Required | Default | Notes |
 |---|---|---|---|
-| `ANTHROPIC_API_KEY` | no | — | Claude slug suggestions, copy .env.example to .env and fill it if needed |
-| `ALLOWED_ORIGINS` | yes | — | Comma-separated CORS origins |
+| `ALLOWED_ORIGINS` | auto | set by compose | Set in docker compose for dev |
 | `DATABASE_URL` | auto | set by compose | Set in docker compose for dev |
 | `REDIS_URL` | auto | set by compose | Set in docker compose for dev |
-| `PORT` | no | `8080` | |
-| `ENVIRONMENT` | no | `development` | `production` enables Gin release mode |
+| `PORT` | auto | set by compose | Set in docker compose for dev |
+| `ENVIRONMENT` | auto | set by compose | `production` enables Gin release mode |
+| `LOG_LEVEL` | auto | set by compose | Set in docker compose for dev |
 
 ## GitHub Actions secrets
 

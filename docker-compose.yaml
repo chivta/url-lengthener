@@ -5,8 +5,9 @@ services:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
       POSTGRES_DB: app
+      PGPORT: 5433
     ports:
-      - "5432:5432"
+      - "5433:5433"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -29,12 +30,15 @@ services:
     build:
       context: ./api
       target: dev
-    env_file: .env
     environment:
-      - DATABASE_URL=postgres://app:app@postgres:5432/app?sslmode=disable
+      - DATABASE_URL=postgres://app:app@postgres:5433/app?sslmode=disable
       - REDIS_URL=redis://redis:6379
+      - ALLOWED_ORIGINS=http://localhost:5173
+      - PORT=8084
+      - ENVIRONMENT=development
+      - LOG_LEVEL=info
     ports:
-      - "8080:8080"
+      - "8084:8084"
     volumes:
       - ./api:/app
     depends_on:
@@ -47,6 +51,9 @@ services:
     build:
       context: ./frontend
       target: dev
+    environment:
+      - PORT=8084
+      - VITE_API_BASE_URL=
     ports:
       - "5173:5173"
     volumes:
