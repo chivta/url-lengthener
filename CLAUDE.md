@@ -26,15 +26,13 @@ Worker (local): `cd worker && npx wrangler dev`
 
 ## Key architectural decisions
 
-**Slug format** — 8 chars, base62 `[0-9A-Za-z]`, `crypto/rand`. Auto-retry once on conflict when no custom slug given.
+**Slug format** — up to 8192 bytes (8KB, the "lengthener" bit), `[0-9A-Za-z\-_.~]`, `crypto/rand`. Custom slug if provided, otherwise randomly generated. Auto-retry once on conflict when no custom slug given. Identity/lookup is keyed on `sha256(slug)` (stored as `slug_hash`, unique-indexed) rather than the raw string — Postgres btree index entries cap at ~2.7KB and the planned Cloudflare KV edge cache caps keys at 512 bytes, so a fixed-size digest is the only thing that can be indexed/keyed regardless of slug length.
 
 **Click counting** — Cloudflare Durable Object is the hot counter (per-slug). Alarm flushes to `POST /internal/clicks/flush` on the Go API every 60s. Go API increments postgres `click_count` asynchronously (fire-and-forget goroutine) on every redirect.
 
 **Redirect path** — Cloudflare Worker handles `GET /:slug` at the edge: KV lookup (300s cacheTtl) → fallback to Go API → cache result for 1h. The Go API also has a `GET /:slug` fallback for non-Cloudflare environments.
 
 **Migrations** — `golang-migrate` with `embed.FS`. Run automatically on `server.Run()` before the HTTP listener starts.
-
-**AI slugs** — `POST /api/v1/urls/suggest` streams Claude Haiku tool_use responses as SSE. The `suggest_slugs` tool returns a `candidates` string array; the handler emits one `data:` event per slug.
 
 **Interfaces at consumer** — `URLRepository`, `ClickRepository`, `URLService` interfaces are defined in `domain/interfaces.go` (consumed by the service/handler layers), not in the packages that implement them.
 
@@ -46,7 +44,6 @@ Worker (local): `cd worker && npx wrangler dev`
 |---|---|---|---|
 | `DATABASE_URL` | yes | — | postgres DSN |
 | `REDIS_URL` | yes | — | `redis://host:port` |
-| `ANTHROPIC_API_KEY` | yes | — | for slug suggestions |
 | `ALLOWED_ORIGINS` | yes | — | comma-separated CORS origins |
 | `PORT` | no | `8080` | |
 | `ENVIRONMENT` | no | `development` | `production` sets gin release mode |
