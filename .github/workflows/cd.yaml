@@ -7,9 +7,51 @@ on:
     branches: [main]
 
 jobs:
-  build-and-push:
+  detect-changes:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    outputs:
+      api_changed: ${{ steps.diff.outputs.api_changed }}
+      frontend_changed: ${{ steps.diff.outputs.frontend_changed }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Compare against deployed image tags
+        id: diff
+        run: |
+          api_tag=$(awk '/name: url-lengthener-api/{f=1} f && /newTag:/{print $2; exit}' k8s/kustomization.yaml)
+          frontend_tag=$(awk '/name: url-lengthener-frontend/{f=1} f && /newTag:/{print $2; exit}' k8s/kustomization.yaml)
+
+          changed() {
+            local deployed_tag="$1" path="$2"
+            if ! git rev-parse --verify --quiet "${deployed_tag}^{commit}" >/dev/null; then
+              echo true   # deployed tag not found locally (e.g. first deploy) - rebuild to be safe
+            elif git diff --quiet "$deployed_tag" HEAD -- "$path"; then
+              echo false
+            else
+              echo true
+            fi
+          }
+
+          echo "api_changed=$(changed "$api_tag" api/)" >> "$GITHUB_OUTPUT"
+          echo "frontend_changed=$(changed "$frontend_tag" frontend/)" >> "$GITHUB_OUTPUT"
+
+      - name: Summary
+        run: |
+          echo "deployed api tag: $(awk '/name: url-lengthener-api/{f=1} f && /newTag:/{print $2; exit}' k8s/kustomization.yaml) -> api_changed=${{ steps.diff.outputs.api_changed }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "deployed frontend tag: $(awk '/name: url-lengthener-frontend/{f=1} f && /newTag:/{print $2; exit}' k8s/kustomization.yaml) -> frontend_changed=${{ steps.diff.outputs.frontend_changed }}" >> "$GITHUB_STEP_SUMMARY"
+
+  build-and-push:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.api_changed == 'true' || needs.detect-changes.outputs.frontend_changed == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      api_built: ${{ needs.detect-changes.outputs.api_changed }}
+      frontend_built: ${{ needs.detect-changes.outputs.frontend_changed }}
     permissions:
       id-token: write
       contents: write
@@ -29,6 +71,9 @@ jobs:
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
       - name: Set deployment variables
         id: vars
         run: |
@@ -36,44 +81,57 @@ jobs:
           echo "vite_api_url=${{ secrets.VITE_API_BASE_URL_PROD }}" >> "$GITHUB_OUTPUT"
 
       - name: Build and push API image
-        env:
-          REGISTRY: ${{ steps.ecr.outputs.registry }}
-          IMAGE_TAG: ${{ steps.vars.outputs.image_tag }}
-        run: |
-          docker build --target prod \
-            -t "$REGISTRY/url-lengthener-api:$IMAGE_TAG" \
-            api/
-          docker push "$REGISTRY/url-lengthener-api:$IMAGE_TAG"
+        if: needs.detect-changes.outputs.api_changed == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: api
+          target: prod
+          push: true
+          tags: ${{ steps.ecr.outputs.registry }}/url-lengthener-api:${{ steps.vars.outputs.image_tag }}
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
 
       - name: Build and push frontend image
-        env:
-          REGISTRY: ${{ steps.ecr.outputs.registry }}
-          IMAGE_TAG: ${{ steps.vars.outputs.image_tag }}
-          VITE_API_BASE_URL: ${{ steps.vars.outputs.vite_api_url }}
-        run: |
-          docker build --target prod \
-            --build-arg VITE_API_BASE_URL="$VITE_API_BASE_URL" \
-            -t "$REGISTRY/url-lengthener-frontend:$IMAGE_TAG" \
-            frontend/
-          docker push "$REGISTRY/url-lengthener-frontend:$IMAGE_TAG"
+        if: needs.detect-changes.outputs.frontend_changed == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: frontend
+          target: prod
+          push: true
+          build-args: |
+            VITE_API_BASE_URL=${{ steps.vars.outputs.vite_api_url }}
+          tags: ${{ steps.ecr.outputs.registry }}/url-lengthener-frontend:${{ steps.vars.outputs.image_tag }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
 
       - name: Update image tags in kustomization
         env:
           REGISTRY: ${{ steps.ecr.outputs.registry }}
           IMAGE_TAG: ${{ steps.vars.outputs.image_tag }}
+          API_CHANGED: ${{ needs.detect-changes.outputs.api_changed }}
+          FRONTEND_CHANGED: ${{ needs.detect-changes.outputs.frontend_changed }}
         run: |
           cd k8s
           if command -v kustomize >/dev/null 2>&1; then
-            kustomize edit set image \
-              "url-lengthener-api=$REGISTRY/url-lengthener-api:$IMAGE_TAG" \
-              "url-lengthener-frontend=$REGISTRY/url-lengthener-frontend:$IMAGE_TAG"
+            if [ "$API_CHANGED" = "true" ]; then
+              kustomize edit set image "url-lengthener-api=$REGISTRY/url-lengthener-api:$IMAGE_TAG"
+            fi
+            if [ "$FRONTEND_CHANGED" = "true" ]; then
+              kustomize edit set image "url-lengthener-frontend=$REGISTRY/url-lengthener-frontend:$IMAGE_TAG"
+            fi
           else
-            sed -i \
-              -e "/name: url-lengthener-api/{n;n;s|newTag:.*|newTag: $IMAGE_TAG|}" \
-              -e "/name: url-lengthener-frontend/{n;n;s|newTag:.*|newTag: $IMAGE_TAG|}" \
-              -e "s|newName: .*url-lengthener-api|newName: $REGISTRY/url-lengthener-api|" \
-              -e "s|newName: .*url-lengthener-frontend|newName: $REGISTRY/url-lengthener-frontend|" \
-              kustomization.yaml
+            if [ "$API_CHANGED" = "true" ]; then
+              sed -i \
+                -e "/name: url-lengthener-api/{n;n;s|newTag:.*|newTag: $IMAGE_TAG|}" \
+                -e "s|newName: .*url-lengthener-api|newName: $REGISTRY/url-lengthener-api|" \
+                kustomization.yaml
+            fi
+            if [ "$FRONTEND_CHANGED" = "true" ]; then
+              sed -i \
+                -e "/name: url-lengthener-frontend/{n;n;s|newTag:.*|newTag: $IMAGE_TAG|}" \
+                -e "s|newName: .*url-lengthener-frontend|newName: $REGISTRY/url-lengthener-frontend|" \
+                kustomization.yaml
+            fi
           fi
 
       - name: Commit and push updated manifest
