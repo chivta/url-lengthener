@@ -34,7 +34,7 @@ func (s *Server) Run(ctx context.Context) error {
 	}
 	defer pool.Close()
 
-	err = repository.RunMigrations(pool)
+	err = repository.RunMigrations(s.cfg.DatabaseURL)
 	if err != nil {
 		return fmt.Errorf("migrations: %w", err)
 	}

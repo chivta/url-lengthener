@@ -7,23 +7,17 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
-	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/arvlas/url-lengthener/api/migrations"
 )
 
-func RunMigrations(pool *pgxpool.Pool) error {
+func RunMigrations(databaseURL string) error {
 	src, err := iofs.New(migrations.FS, ".")
 	if err != nil {
 		return fmt.Errorf("iofs.New: %w", err)
 	}
 
-	cfg := pool.Config().ConnConfig
-	dsn := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable",
-		cfg.User, cfg.Password, cfg.Host, cfg.Database,
-	)
-
-	m, err := migrate.NewWithSourceInstance("iofs", src, dsn)
+	m, err := migrate.NewWithSourceInstance("iofs", src, databaseURL)
 	if err != nil {
 		return fmt.Errorf("migrate.New: %w", err)
 	}
