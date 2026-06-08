@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	slugAlphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-	slugLength   = 8
+	slugAlphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.~"
+	slugLength   = 8192
 )
 
-var validSlugRe = regexp.MustCompile(`^[a-zA-Z0-9]{1,16}$`)
+var validSlugRe = regexp.MustCompile(`^[a-zA-Z0-9_.~-]+$`)
 
 func generateSlug() string {
 	b := make([]byte, slugLength)
@@ -23,5 +23,5 @@ func generateSlug() string {
 }
 
 func isValidSlug(s string) bool {
-	return validSlugRe.MatchString(s)
+	return len(s) > 0 && len(s) <= slugLength && validSlugRe.MatchString(s)
 }
