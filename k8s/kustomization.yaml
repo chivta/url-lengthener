@@ -14,7 +14,7 @@ resources:
 images:
 - name: url-lengthener-api
   newName: 235336959928.dkr.ecr.eu-west-1.amazonaws.com/url-lengthener-api
-  newTag: e3e9a1e08dbc1dacaf7b3d84ee86c4658c1a3647
+  newTag: f6bf2f86bf7223c796bcfa6dd8330c4a4f611c5c
 - name: url-lengthener-frontend
   newName: 235336959928.dkr.ecr.eu-west-1.amazonaws.com/url-lengthener-frontend
   newTag: dd20cf6979b1ca1e36906bf2b3ea1c8522f0a48c
