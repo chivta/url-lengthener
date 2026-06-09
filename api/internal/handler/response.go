@@ -5,12 +5,26 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 
 	"github.com/arvlas/url-lengthener/api/internal/domain"
 )
 
 func writeError(c *gin.Context, err error) {
-	c.JSON(statusFor(err), gin.H{"code": errorCode(err)})
+	status := statusFor(err)
+	code := errorCode(err)
+
+	ev := log.Warn()
+	if status == http.StatusInternalServerError {
+		ev = log.Error()
+	}
+	ev.Err(err).
+		Str("method", c.Request.Method).
+		Str("path", c.Request.URL.Path).
+		Int("status", status).
+		Msg(code)
+
+	c.JSON(status, gin.H{"code": code})
 }
 
 func statusFor(err error) int {

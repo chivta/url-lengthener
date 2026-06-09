@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"log/slog"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
 func loggingMiddleware() gin.HandlerFunc {
@@ -18,13 +18,13 @@ func loggingMiddleware() gin.HandlerFunc {
 		}
 		start := time.Now()
 		c.Next()
-		slog.Info("request",
-			"method", c.Request.Method,
-			"path", c.Request.URL.Path,
-			"status", c.Writer.Status(),
-			"duration", time.Since(start),
-			"request_id", c.GetHeader("X-Request-Id"),
-		)
+		log.Info().
+			Str("method", c.Request.Method).
+			Str("path", c.Request.URL.Path).
+			Int("status", c.Writer.Status()).
+			Dur("duration", time.Since(start)).
+			Str("request_id", c.GetHeader("X-Request-Id")).
+			Msg("request")
 	}
 }
 

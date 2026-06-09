@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/arvlas/url-lengthener/api/internal/domain"
 )
 
@@ -58,8 +60,12 @@ func (s *urlService) Resolve(ctx context.Context, slug string) (*domain.URL, err
 	}
 	go func() { //nolint:gosec // intentional: click counting must outlive the request context
 		bgCtx := context.Background()
-		_ = s.clickRepo.Record(bgCtx, &domain.Click{URLID: u.ID})
-		_ = s.urlRepo.IncrementClickCount(bgCtx, slug)
+		if err := s.clickRepo.Record(bgCtx, &domain.Click{URLID: u.ID}); err != nil {
+			log.Error().Err(err).Str("url_id", u.ID).Msg("click record")
+		}
+		if err := s.urlRepo.IncrementClickCount(bgCtx, slug); err != nil {
+			log.Error().Err(err).Str("slug", slug).Msg("click increment")
+		}
 	}()
 	return u, nil
 }

@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog/log"
 
 	"github.com/arvlas/url-lengthener/api/internal/config"
 	"github.com/arvlas/url-lengthener/api/internal/handler"
@@ -60,16 +60,16 @@ func (s *Server) Run(ctx context.Context) error {
 		IdleTimeout:  120 * time.Second,
 	}
 
-	slog.Info("server starting", "port", s.cfg.Port, "env", s.cfg.Environment)
+	log.Info().Str("port", s.cfg.Port).Str("env", s.cfg.Environment).Msg("server starting")
 	go func() {
 		err := srv.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			slog.Error("listen", "error", err)
+			log.Error().Err(err).Msg("listen")
 		}
 	}()
 
 	<-ctx.Done()
-	slog.Info("server shutting down")
+	log.Info().Msg("server shutting down")
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
