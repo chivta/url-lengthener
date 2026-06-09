@@ -17,4 +17,4 @@ images:
   newTag: f6bf2f86bf7223c796bcfa6dd8330c4a4f611c5c
 - name: url-lengthener-frontend
   newName: 235336959928.dkr.ecr.eu-west-1.amazonaws.com/url-lengthener-frontend
-  newTag: dd20cf6979b1ca1e36906bf2b3ea1c8522f0a48c
+  newTag: 5839180f71df38a5db668eb5df1ea5f971fc8471
