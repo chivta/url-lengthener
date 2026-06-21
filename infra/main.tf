@@ -18,6 +18,26 @@ module "eks" {
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnet_ids
   node_instance_type = var.eks_node_instance_type
+  aws_region         = var.aws_region
+}
+
+module "cert_manager" {
+  source = "./modules/cert-manager"
+
+  project     = var.project
+  environment = local.environment
+
+  depends_on = [module.eks]
+}
+
+module "traefik" {
+  source = "./modules/traefik"
+
+  project           = var.project
+  environment       = local.environment
+  public_subnet_ids = module.vpc.public_subnet_ids
+
+  depends_on = [module.eks]
 }
 
 module "rds" {
