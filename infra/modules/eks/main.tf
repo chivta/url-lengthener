@@ -2,13 +2,16 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
 
-  name    = "${var.project}-${var.environment}"
+  name               = "${var.project}-${var.environment}"
   kubernetes_version = "1.33"
 
-  vpc_id                         = var.vpc_id
-  subnet_ids                     = var.private_subnet_ids
-  endpoint_public_access = true
+  vpc_id                                   = var.vpc_id
+  subnet_ids                               = var.private_subnet_ids
+  endpoint_public_access                   = true
   enable_cluster_creator_admin_permissions = true
+
+  enabled_log_types                      = ["api"]
+  cloudwatch_log_group_retention_in_days = 14
 
   tags = {
     Project     = var.project

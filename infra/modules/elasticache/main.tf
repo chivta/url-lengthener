@@ -26,13 +26,13 @@ resource "aws_security_group" "redis" {
 }
 
 resource "aws_elasticache_replication_group" "this" {
-  replication_group_id = "${var.project}-${var.environment}"
-  description          = "Redis for ${var.project} ${var.environment}"
-  node_type            = "cache.t3.micro"
-  engine_version       = "7.0"
-  num_node_groups      = 1
+  replication_group_id    = "${var.project}-${var.environment}"
+  description             = "Redis for ${var.project} ${var.environment}"
+  node_type               = "cache.t3.micro"
+  engine_version          = "7.0"
+  num_node_groups         = 1
   replicas_per_node_group = 0
-  port                 = 6379
+  port                    = 6379
 
   subnet_group_name  = aws_elasticache_subnet_group.this.name
   security_group_ids = [aws_security_group.redis.id]

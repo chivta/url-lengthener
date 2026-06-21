@@ -2,6 +2,10 @@ output "eks_cluster_name" {
   value = module.eks.cluster_name
 }
 
+output "lbc_iam_role_arn" {
+  value = module.eks.lbc_iam_role_arn
+}
+
 output "rds_endpoint" {
   value     = module.rds.endpoint
   sensitive = true
